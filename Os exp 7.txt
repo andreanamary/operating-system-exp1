@@ -1,0 +1,74 @@
+#include <stdio.h>
+
+int main() {
+    int n, m;
+    printf("Enter number of pages in reference string: \n");
+    scanf("%d", &n);
+
+    int ref[n];
+    printf("Enter the reference string: \n");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &ref[i]);
+    }
+
+    printf("Enter number of frames: \n");
+    scanf("%d", &m);
+
+    int frames[m];
+    int lastUsed[m]; 
+    for (int i = 0; i < m; i++) {
+        frames[i] = -1;
+        lastUsed[i] = -1;
+    }
+
+    int faults = 0, hits = 0;
+
+    for (int i = 0; i < n; i++) {
+        int page = ref[i];
+        int found = -1;
+
+        // Check if page is already in frames
+        for (int j = 0; j < m; j++) {
+            if (frames[j] == page) {
+                found = j;
+                break;
+            }
+        }
+
+        if (found != -1) {
+            hits++;
+            lastUsed[found] = i; 
+        } else {
+            faults++;
+            int replaceIndex = -1;
+
+            for (int j = 0; j < m; j++) {
+                if (frames[j] == -1) {
+                    replaceIndex = j;
+                    break;
+                }
+            }
+
+            if (replaceIndex == -1) {
+                int lruIndex = 0;
+                int minTime = lastUsed[0];
+                for (int j = 1; j < m; j++) {
+                    if (lastUsed[j] < minTime) {
+                        minTime = lastUsed[j];
+                        lruIndex = j;
+                    }
+                }
+                replaceIndex = lruIndex;
+            }
+
+            frames[replaceIndex] = page;
+            lastUsed[replaceIndex] = i;
+        }
+
+    }
+
+    printf("\nTotal Page Faults: %d\n", faults);
+    printf("Total Page Hits: %d\n", hits);
+
+    return 0;
+}

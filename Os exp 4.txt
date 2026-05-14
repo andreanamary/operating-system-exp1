@@ -1,0 +1,64 @@
+#include <stdio.h>
+
+struct Process {
+    int id;
+    int at;  
+    int bt;   
+    int ct;
+    int tat;  
+    int wt;
+    int rt;   
+};
+
+int main() {
+    int n, tq;
+    printf("Enter number of processes: \n");
+    scanf("%d", &n);
+
+    printf("Enter Time Quantum: \n");
+    scanf("%d", &tq);
+
+    struct Process p[n];
+    for (int i = 0; i < n; i++) {
+        p[i].id = i + 1;
+        printf("Enter AT and BT for P%d: \n", i + 1);
+        scanf("%d %d", &p[i].at, &p[i].bt);
+        p[i].rt = p[i].bt;
+        p[i].ct = p[i].tat = p[i].wt = 0;
+    }
+
+    int time = 0, done = 0;
+    while (done < n) {
+        int executed = 0;
+        for (int i = 0; i < n; i++) {
+            if (p[i].rt > 0 && p[i].at <= time) {
+                executed = 1;
+                if (p[i].rt > tq) {
+                    time += tq;
+                    p[i].rt -= tq;
+                } else {
+                    time += p[i].rt;
+                    p[i].rt = 0;
+                    p[i].ct = time;
+                    done++;
+                }
+            }
+        }
+        if (!executed) {
+            time++; 
+        }
+    }
+
+    float totalTAT = 0, totalWT = 0;
+    for (int i = 0; i < n; i++) {
+        p[i].tat = p[i].ct - p[i].at;
+        p[i].wt = p[i].tat - p[i].bt;
+        totalTAT += p[i].tat;
+        totalWT += p[i].wt;
+    }
+
+    printf("\nAverage Turnaround Time: %.2f\n", totalTAT / n);
+    printf("Average Waiting Time: %.2f\n", totalWT / n);
+
+    return 0;
+}
